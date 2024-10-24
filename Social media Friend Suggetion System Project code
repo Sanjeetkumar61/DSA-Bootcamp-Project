@@ -1,0 +1,57 @@
+from collections import deque, defaultdict
+
+# Social media graph where users are nodes and friendships are edges
+class SocialMediaGraph:
+    def __init__(self):
+        # Use defaultdict to automatically create lists for each user node
+        self.graph = defaultdict(list)
+
+    # Add a friendship (edge) between two users
+    def add_friendship(self, user1, user2):
+        self.graph[user1].append(user2)
+        self.graph[user2].append(user1)  # Assuming undirected graph (mutual friendship)
+
+    # Breadth-First Search for friend suggestion
+    def friend_suggestions(self, user):
+        visited = set()  # Track visited nodes
+        queue = deque([user])  # Queue for BFS starting from the given user
+        suggestions = set()  # Store friend suggestions
+
+        # Mark the user and their direct friends as visited
+        visited.add(user)
+        
+        # Get the direct friends (first-degree connections) of the user
+        direct_friends = set(self.graph[user])
+        visited.update(direct_friends)
+
+        # Debugging output
+        print(f"User -> {user}, Direct Friends -> {direct_friends}")
+
+        # BFS: Find second-degree friends
+        for friend in direct_friends:
+            # Explore friends of friends
+            for friend_of_friend in self.graph[friend]:
+                if friend_of_friend not in visited:
+                    suggestions.add(friend_of_friend)
+        
+        return suggestions
+
+# Testing the BFS-based friend suggestion system
+if __name__ == "__main__":
+    # Create a new social media graph
+    smg = SocialMediaGraph()
+
+    # Add friendships
+    smg.add_friendship("Alice", "Bob")
+    smg.add_friendship("Alice", "Charlie")
+    smg.add_friendship("Bob", "David")
+    smg.add_friendship("Charlie", "Emma")
+    smg.add_friendship("David", "Frank")
+    smg.add_friendship("Emma", "George")
+
+    # Debugging: print the graph structure
+    print("Graph connections:", dict(smg.graph))
+
+    user = input("Enter User Name :-")
+    suggestions = smg.friend_suggestions(user)
+    print("Friend suggestions for Bob:", suggestions)
